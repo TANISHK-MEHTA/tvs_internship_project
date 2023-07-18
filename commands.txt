@@ -1,0 +1,10 @@
+virtualenv env
+source env/bin/activate
+django-admin startproject mysite
+python manage.py startapp polls
+
+
+python manage.py runserver
+python manage.py makemigrations - while creating a model
+python manage.py migrate - while adding the migrations in database
+python manage.py createsuperuser - /admin

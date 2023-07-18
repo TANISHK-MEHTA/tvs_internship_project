@@ -1,0 +1,222 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+    /* Add your CSS styles here to enhance the UI */
+    body {
+        background-color: #f6f6f6;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .frequency {
+        margin-bottom: 10px;
+    }
+
+    .frequency h1 {
+        font-size: 24px;
+        margin-bottom: 5px;
+    }
+
+    .frequency p {
+        font-size: 16px;
+        margin-bottom: 0;
+    }
+
+    .testcase {
+        margin-bottom: 20px;
+    }
+
+    .testcase h1 {
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .testcase p {
+        margin-bottom: 5px;
+    }
+
+    .testcase .reason {
+        font-style: italic;
+        color: gray;
+    }
+
+    .charts-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .chart-container {
+        width: 400px;
+        height: 400px;
+        margin-bottom: 20px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<div class="container">
+    <table>
+        <tr>
+            <th>Frequency</th>
+            <th>Result Count</th>
+        </tr>
+        {% for frequency in frequencies %}
+        <tr>
+            <td>{{ frequency.result }}</td>
+            <td>{{ frequency.result__count }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <div class="charts-container">
+        <div class="chart-container">
+            <h2>Pie Chart</h2>
+            <canvas id="pie-chart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h2>Bar Chart</h2>
+            <canvas id="bar-chart"></canvas>
+        </div>
+    </div>
+
+    <!-- Result filter buttons -->
+    <button onclick="filterTestCases('pass')">Pass</button>
+    <button onclick="filterTestCases('fail')">Fail</button>
+    <button onclick="filterTestCases('executed')">Executed</button>
+    <button onclick="filterTestCases('blocked')">Blocked</button>
+    <button onclick="filterTestCases('inprogress')">In Progress</button>
+
+    {% for testcase in testcases %}
+    <div class="testcase" id="{{ testcase.id }}">
+        <h1>{{ testcase.testCase }}</h1>
+        <p>{{ testcase.result }}</p>
+        <p class="reason">{{ testcase.reason }}</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Retrieve the frequency count values from the table
+        const frequencyCounts = Array.from(document.querySelectorAll('table tr')).slice(1).map(row => {
+            const frequency = row.cells[0].innerText;
+            const count = parseInt(row.cells[1].innerText);
+            return { frequency, count };
+        });
+
+        // Create arrays for labels, data, and colors
+        const labels = frequencyCounts.map(item => item.frequency);
+        const data = frequencyCounts.map(item => item.count);
+        const colors = generateColors(labels);
+
+        // Generate colors based on the labels
+        function generateColors(labels) {
+            const colors = ['yellow', 'orange', 'purple', 'red', 'green'];
+            const colorMap = {};
+
+            labels.forEach((label, index) => {
+                colorMap[label.toLowerCase()] = colors[index % colors.length];
+            });
+
+            return labels.map(label => colorMap[label.toLowerCase()] || '#' + Math.floor(Math.random() * 16777215).toString(16));
+        }
+
+        // Create the pie chart using Chart.js
+        const pieChartCtx = document.getElementById('pie-chart').getContext('2d');
+        new Chart(pieChartCtx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                }],
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Frequency Count (Pie Chart)',
+                    fontSize: 20,
+                },
+            },
+        });
+
+        // Create the bar chart using Chart.js
+        const barChartCtx = document.getElementById('bar-chart').getContext('2d');
+        new Chart(barChartCtx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.9,
+                }],
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: 'Frequency Count (Bar Chart)',
+                    fontSize: 20,
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                    },
+                },
+            },
+        });
+    });
+
+    // Function to filter test cases based on result category
+    function filterTestCases(category) {
+        const testCases = document.getElementsByClassName('testcase');
+        for (let i = 0; i < testCases.length; i++) {
+            const testCase = testCases[i];
+            const result = testCase.querySelector('p').innerText;
+
+            if (result.toLowerCase() === category.toLowerCase()) {
+                testCase.style.display = 'block';
+            } else {
+                testCase.style.display = 'none';
+            }
+        }
+    }
+</script>
+
+{% endblock %}

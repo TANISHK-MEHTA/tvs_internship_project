@@ -1,0 +1,158 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-family: 'Roboto', sans-serif;
+        background: linear-gradient(to bottom, #f2f2f2, #e6e6e6);
+    }
+
+    .container {
+        width: 350px;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #cccccc;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .error-message {
+        color: #ff0000;
+        font-size: 12px;
+        margin-top: -10px;
+        margin-bottom: 20px;
+    }
+
+    button {
+        padding: 12px;
+        background-color: #4caf50;
+        color: #ffffff;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    .success-message {
+        text-align: center;
+        font-size: 18px;
+        color: #4caf50;
+    }
+</style>
+
+<div class="container">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="success-message">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    <h1>Login</h1>
+    <form id="login-form" action="" method="POST">
+        {% csrf_token %}
+        <label for="login-email">Username</label>
+        <input type="text" name="username" required>
+        <div class="error-message" id="login-email-error"></div>
+
+        <label for="login-password">Password</label>
+        <input type="password" name="password" required>
+        <div class="error-message" id="login-password-error"></div>
+
+        <button type="submit">Login</button>
+        <h4>New User? <a href="{% url 'register' %}">Register</a></h4>
+    </form>
+</div>
+<!-- 
+<script>
+
+    document.getElementById("login-form").addEventListener("submit", function (event) {
+        event.preventDefault();
+        clearErrorMessages();
+
+        var email = document.getElementById("login-email").value;
+        var password = document.getElementById("login-password").value;
+
+        if (!validateString(email)) {
+            showErrorMessage("login-email-error", "Email is required");
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            showErrorMessage("login-email-error", "Please enter a valid email address");
+            return;
+        }
+
+        if (!validateString(password)) {
+            showErrorMessage("login-password-error", "Password is required");
+            return;
+        }
+
+        // Perform your login logic here
+
+        // Assuming login is successful, redirect the user to success.html
+        window.location.href = "project.html";
+    });
+
+    function validateString (input) {
+        return input.trim().length > 0;
+    }
+
+    function validateEmail (email) {
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    function clearErrorMessages () {
+        var errorMessages = document.getElementsByClassName("error-message");
+        for (var i = 0; i < errorMessages.length; i++) {
+            errorMessages[i].textContent = "";
+        }
+    }
+
+    function showErrorMessage (elementId, message) {
+        var errorMessage = document.getElementById(elementId);
+        errorMessage.textContent = message;
+    }
+</script> -->
+
+
+{% endblock %}
